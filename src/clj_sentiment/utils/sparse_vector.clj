@@ -8,14 +8,28 @@
   ([a] (into {} (filter (fn [[_ v]] (not (zero? v))) a)))
   ([a b] (sparse-vec (zipmap a b))))
 
+
+(defn average [& vecs]
+  "Calculate the average over vecs."
+  (let [n (count vecs)]
+    (reduce sum (map #(div % n) vecs))))
+
+(defn div [v n]
+  "Divide sparse vec v by n"
+  (reduce (fn [m [k val]] (assoc m k (/ val n))) {} v))
+
+(defn mult [v n]
+  "Multiply sparse vector v with n"
+  (reduce (fn [m [k val]] (assoc m k (* val n))) {} v))
+
 (defn sum [a b]
   "Component wise sum of a and b"
-  (let [[a b] (if (> (count a) (count b)) [b a] [a b])]
-    (map (fn [[k v]] (+ v (get b k 0))) a)))
+  (merge-with + a b))
 
 (defn diff [a b]
   "Component wise difference of a and b"
-  (map (fn [[k v]] (- v (get b k 0))) a))
+  (merge-with - a b))
+
 
 (defn inner-product [a b]
   "Calculates the inner product (dot product) of two sparse vectors."
